@@ -1,0 +1,8 @@
+INSERT INTO job (no) VALUES (1);
+INSERT INTO job (no) VALUES (2);
+INSERT INTO job (no) VALUES (3);
+INSERT INTO job (no) VALUES (4);
+INSERT INTO job (no) VALUES (5);
+INSERT INTO job (no) VALUES (6);
+INSERT INTO job (no) VALUES (7);
+INSERT INTO job (no) VALUES (8);
