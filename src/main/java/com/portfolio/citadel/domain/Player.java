@@ -6,7 +6,7 @@ import lombok.Getter;
 public class Player {
     private int no;
     private Job job;
-    private Boolean crown;
+    private boolean crown;
 
     public Player(int no) {
         this.no = no;
