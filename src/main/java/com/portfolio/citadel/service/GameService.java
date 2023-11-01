@@ -31,9 +31,7 @@ public class GameService {
         for(int i=1; i<=round; i++) {
             log.info(String.format("[Round %d]", i));
 
-            pw.sortByKing();
             pw.chooseJob(jobList);
-            pw.sortByJob();
             pw.doAction();
 
             log.info(String.format("[Round %d end]", i));

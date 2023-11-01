@@ -8,9 +8,9 @@ public class Player {
     private Job job;
     private boolean crown;
 
-    public Player(int no) {
+    public Player(int no, boolean isCrown) {
         this.no = no;
-        this.crown = false;
+        this.crown = isCrown;
     }
 
     public void setJob(Job job) {
