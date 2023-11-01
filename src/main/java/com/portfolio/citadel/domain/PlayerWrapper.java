@@ -54,7 +54,7 @@ public class PlayerWrapper {
             p.setJob(selected);
             jobListCopied.remove(selected);
 
-            log.info(String.format("Player%d가 Job %d를 선택했습니다", p.getNo(), p.getJob().getNo()));
+            log.info(String.format("Player%d가 %s를 선택했습니다", p.getNo(), p.getJob().getName()));
         }
     }
 
@@ -65,12 +65,12 @@ public class PlayerWrapper {
     public void doAction() {
         this.sortByJob();
         for(Player p : this.playerList) {
+            log.info(String.format("%s의 차례입니다. Player%d가 행동합니다.", p.getJob().getName(), p.getNo()));
             if(p.getJob().isKing()) {
-                log.info(String.format("Player%d가 왕입니다. 왕관을 가져갑니다.", p.getNo()));
+                log.info(String.format("왕관을 가져옵니다."));
                 playerList.stream().filter(p_-> p_.isCrown()).findAny().get().setCrown(false);
                 p.setCrown(true);
             }
-            log.info(String.format("Job %d, Player%d가 행동합니다.", p.getJob().getNo(), p.getNo()));
         }
     }
 }
