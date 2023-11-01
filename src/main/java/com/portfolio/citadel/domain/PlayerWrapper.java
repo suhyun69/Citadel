@@ -62,15 +62,21 @@ public class PlayerWrapper {
         this.playerList = this.playerList.stream().sorted(Comparator.comparingInt(p -> p.getJob().getNo())).collect(Collectors.toList());
     }
 
-    public void doAction() {
-        this.sortByJob();
-        for(Player p : this.playerList) {
-            log.info(String.format("%s의 차례입니다. Player%d가 행동합니다.", p.getJob().getName(), p.getNo()));
-            if(p.getJob().isKing()) {
-                log.info(String.format("왕관을 가져옵니다."));
-                playerList.stream().filter(p_-> p_.isCrown()).findAny().get().setCrown(false);
-                p.setCrown(true);
-            }
+    public void doAction(List<Job> jobList) {
+        // this.sortByJob();
+
+        for(Job job : jobList) {
+            Optional<Player> player = this.playerList.stream().filter(p -> p.getJob().getNo() == job.getNo()).findAny();
+            player.ifPresentOrElse(p -> {
+                log.info(String.format("%s의 차례입니다. Player%d가 행동합니다.", p.getJob().getName(), p.getNo()));
+                if(p.getJob().isKing()) {
+                    log.info(String.format("왕관을 가져옵니다."));
+                    playerList.stream().filter(p_-> p_.isCrown()).findAny().get().setCrown(false);
+                    p.setCrown(true);
+                }
+            }, () -> {
+                // log.info(String.format("%s가 없습니다.턴을 넘깁니다.", job.getName()));
+            });
         }
     }
 }
