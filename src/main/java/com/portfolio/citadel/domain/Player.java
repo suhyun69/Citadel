@@ -95,8 +95,18 @@ public class Player {
     // 건물 짓기
     public void build() {
 
-        if(this.hands.stream().anyMatch(b -> b.getCost() <= this.money)) {
-            List<Building> buildable = this.hands.stream().filter(b -> b.getCost() <= this.money).collect(Collectors.toList());
+        if(this.hands.stream().anyMatch(h -> h.getCost() <= this.money)) {
+
+            List<Building> buildable = this.hands.stream()
+                    .filter(h -> h.getCost() <= this.money)
+                    .filter(h -> !this.buildings.stream().anyMatch(b -> b.getName().equals(h.getName())))
+                    .collect(Collectors.toList());
+
+            // 지을 수 있는 건물이 없으면 return
+            if(buildable.size() == 0)  {
+                log.info(String.format("지을 수 있는 건물이 없습니다."));
+                return;
+            }
 
             Random random = new Random();
             int index = random.nextInt(buildable.size());
@@ -107,6 +117,9 @@ public class Player {
             this.buildings.add(building);
 
             log.info(String.format("[%s(%d)]을 지었습니다.", building.getName(), building.getCost()));
+        }
+        else {
+            log.info(String.format("지을 수 있는 건물이 없습니다."));
         }
     }
 }
