@@ -17,6 +17,7 @@ public class Player {
     private int money;
     private List<Building> hands = new ArrayList<>();
     private List<Building> buildings = new ArrayList<>();
+    private boolean isEndPlayer;
 
     public Player(int no, boolean isCrown) {
         this.no = no;
@@ -30,6 +31,7 @@ public class Player {
     public void setCrown(boolean crown) {
         this.crown = crown;
     }
+    public void setEndPlayer(boolean isEndPlayer) { this.isEndPlayer = isEndPlayer; }
 
     public void addHand(Building building) {
         this.getHands().add(building);
@@ -121,5 +123,29 @@ public class Player {
         else {
             log.info(String.format("지을 수 있는 건물이 없습니다."));
         }
+    }
+
+    public int getTotalScore() {
+        int totalScore = 0;
+
+        totalScore += this.buildings.stream().map(b -> b.getCost()).reduce((b1, b2) -> b1 + b2).orElse(0); // 자신의 도시에 있는 건물 카드들의 건설비용만큼 점수를 받습니다.
+
+        // 자신의 도시에 건물 카드가 5가지 종류별로 하나씩 건설되었다면 3점을 받습니다.
+        if(this.buildings.stream().filter(b -> b.getType().equals("N")).count() > 0
+                && this.buildings.stream().filter(b -> b.getType().equals("R")).count() > 0
+                && this.buildings.stream().filter(b -> b.getType().equals("C")).count() > 0
+                && this.buildings.stream().filter(b -> b.getType().equals("A")).count() > 0
+                && this.buildings.stream().filter(b -> b.getType().equals("S")).count() > 0) totalScore += 3;
+
+        if(this.isEndPlayer) {
+            totalScore += 4; // 가장 먼저 도시를 완성시킨 플레이어는 4점을 받습니다.
+        }
+        else {
+            totalScore += this.buildings.size() == 7 ? 2 : 0; // 도시를 완성시킨 나머지 플레이어는 2점을 받습니다.
+        }
+
+        // 특수카드 효과
+
+        return totalScore;
     }
 }

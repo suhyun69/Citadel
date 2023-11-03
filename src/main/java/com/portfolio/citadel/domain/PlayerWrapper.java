@@ -57,4 +57,10 @@ public class PlayerWrapper {
             log.info(String.format("Player%d가 %s를 선택했습니다", p.getNo(), p.getJob().getName()));
         }
     }
+
+    public Player getWinner() {
+        return this.playerList.stream()
+                .max(Comparator.comparingInt(Player::getTotalScore))
+                .get();
+    }
 }

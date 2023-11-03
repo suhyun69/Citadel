@@ -86,13 +86,22 @@ public class GameService {
                     player.build();
 
                     log.info(String.format("턴 종료. (%d/%d/%d)", player.getMoney(), player.getHands().size(), player.getBuildings().size()));
+
+                    if(!isFinalRound && pw.getPlayerList().stream().filter(p -> p.getBuildings().size() == 7).findAny().isPresent()) {
+                        isFinalRound = true;
+                        player.setEndPlayer(true);
+                        log.info(String.format("건물을 7채 지었습니다. 이번 라운드를 마지막으로 게임을 종료합니다."));
+                    }
                 }
             }
 
             log.info(String.format("[Round %d end]", round));
             round++;
 
-            if(pw.getPlayerList().stream().filter(p -> p.getBuildings().size() == 7).findAny().isPresent()) isFinalRound = true;
+            if(isFinalRound) {
+                Player winner = pw.getWinner();
+                log.info(String.format("Player%d가 총점 %d점으로 승리했습니다", winner.getNo(), winner.getTotalScore()));
+            }
         }
     }
 }
