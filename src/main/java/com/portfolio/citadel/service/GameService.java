@@ -55,6 +55,7 @@ public class GameService {
 
         boolean isFinalRound = false;
         int round = 1;
+
         while(!isFinalRound) {
             log.info(String.format("[Round %d]", round));
 
@@ -70,6 +71,8 @@ public class GameService {
                         pw.getPlayerList().stream().filter(p_-> p_.isCrown()).findAny().get().setCrown(false);
                         player.setCrown(true);
                     }
+
+                    player.getMoneyFromBuilding();
 
                     if((int)(Math.random() * 2) == 1) {
                         player.getMoneyFromBank();

@@ -41,6 +41,41 @@ public class Player {
         log.info(String.format("은행으로부터 금화 2개를 받았습니다."));
     }
 
+    // 세금 받기
+    public void getMoneyFromBuilding() {
+        int tax = 0;
+        switch (this.job.getNo()) {
+            case 4:
+                tax = (int)this.buildings.stream().filter(b -> b.getType().equals("N")).count();
+                if(tax > 0) {
+                    this.money += tax;
+                    log.info(String.format("귀족 건물로부터 세금으로 금화 %d개를 받았습니다.", tax));
+                }
+                break;
+            case 5:
+                tax = (int)this.buildings.stream().filter(b -> b.getType().equals("R")).count();
+                if(tax > 0) {
+                    this.money += tax;
+                    log.info(String.format("종교 건물로부터 세금으로 금화 %d개를 받았습니다.", tax));
+                }
+                break;
+            case 6:
+                tax = (int)this.buildings.stream().filter(b -> b.getType().equals("C")).count();
+                if(tax > 0) {
+                    this.money += tax;
+                    log.info(String.format("상업 건물로부터 세금으로 금화 %d개를 받았습니다.", tax));
+                }
+                break;
+            case 8:
+                tax = (int)this.buildings.stream().filter(b -> b.getType().equals("A")).count();
+                if(tax > 0) {
+                    this.money += tax;
+                    log.info(String.format("군사 건물로부터 세금으로 금화 %d개를 받았습니다.", tax));
+                }
+                break;
+        }
+    }
+
     // 건물 카드 받기
     public Building getBuildingCard(List<Building> buildingsFromDeck) {
 
