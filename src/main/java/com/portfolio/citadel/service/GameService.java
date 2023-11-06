@@ -61,7 +61,7 @@ public class GameService {
 
             pw.chooseJob(jobList);
             for(Job job : jobList) {
-                if(pw.getPlayerList().stream().filter(p -> p.getJob().getNo() == job.getNo()).findAny().isPresent()) {
+                if(pw.getPlayerList().stream().anyMatch(p -> p.getJob().getNo() == job.getNo())) {
 
                     Player player = pw.getPlayerList().stream().filter(p -> p.getJob().getNo() == job.getNo()).findAny().get();
 
