@@ -33,7 +33,7 @@ INSERT INTO BUILDING(NAME, COST, TYPE, COUNT, DESCRIPTION) VALUES ('외성', 3, 
 INSERT INTO BUILDING(NAME, COST, TYPE, COUNT, DESCRIPTION) VALUES ('실험실', 5, 'S', 1, '차례마다 한 번, 손에 든 카드 1장을 버리고 금화 2닢을 받습니다');
 INSERT INTO BUILDING(NAME, COST, TYPE, COUNT, DESCRIPTION) VALUES ('도서관', 5, 'S', 1, '자원 얻기 행동으로 건물 카드를 얻는다면, 가져간 카드를 전부 손에 듭니다');
 INSERT INTO BUILDING(NAME, COST, TYPE, COUNT, DESCRIPTION) VALUES ('지도 보관실', 5, 'S', 1, '게임이 종료되면 손에 든 건물 카드 1장당 1점씩을 추가로 받습니다');
-INSERT INTO BUILDING(NAME, COST, TYPE, COUNT, DESCRIPTION) VALUES ('마법학교', 5, 'S', 1, '이미 자신의 도시에 있는 건물과 이름이 똑같은 건물을 건설할 수 있습니다');
+INSERT INTO BUILDING(NAME, COST, TYPE, COUNT, DESCRIPTION) VALUES ('채석장', 5, 'S', 1, '이미 자신의 도시에 있는 건물과 이름이 똑같은 건물을 건설할 수 있습니다');
 INSERT INTO BUILDING(NAME, COST, TYPE, COUNT, DESCRIPTION) VALUES ('마법학교', 6, 'S', 1, '자신의 도시 건물 종류에 따라 자원을 받는 능력을 사용할 때, 마법학교를 원하는 종류의 건물로 간주합니다.');
 INSERT INTO BUILDING(NAME, COST, TYPE, COUNT, DESCRIPTION) VALUES ('대장간', 5, 'S', 1, '차례마다 한 번, 금화 2닢을 내고 카드 3장을 받습니다');
 INSERT INTO BUILDING(NAME, COST, TYPE, COUNT, DESCRIPTION) VALUES ('동상', 3, 'S', 1, '게임이 종료되었을 때 왕관을 가지고 있다면 추가로 5점을 받습니다.');

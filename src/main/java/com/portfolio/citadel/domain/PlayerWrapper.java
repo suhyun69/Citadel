@@ -2,60 +2,113 @@ package com.portfolio.citadel.domain;
 
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Getter
+@Setter
 @Slf4j
 public class PlayerWrapper {
 
-    private List<Player> playerList;
+    private static int initMember = 6;
+    private static int initMoney = 2;
+    private static int initCard = 4;
 
-    public PlayerWrapper() {
-        this.playerList = new ArrayList<>();
-        for(int i=1; i<=6; i++) {
+    private int finalRoundBuilding = 7;
+    private List<Player> playerList = new ArrayList<>();
+    private Queue<Building> buildingDeck = new LinkedList<>();
+
+    public PlayerWrapper(Queue<Building> buildingDeck) {
+
+        this.setBuildingDeck(buildingDeck);
+
+        for(int i=1; i<=initMember; i++) {
             this.playerList.add(new Player(i, i==1));
+        }
+
+        for(Player p : this.getPlayerList()) {
+            p.setMoney(initMoney);
+            IntStream.range(0, initCard).forEach(i -> {
+                p.getHands().add(this.getBuildingDeck().poll());
+            });
         }
     }
 
-    public PlayerWrapper(int memberCount) {
-        this.playerList = new ArrayList<>();
-        for(int i=1; i<=memberCount; i++) {
-            this.playerList.add(new Player(i, i==1));
-        }
-    }
-
-    public List<Player> getPlayerList() {
-        return this.playerList;
-    }
-
+    // PlayerNo 기준으로 정렬하되, 왕관을 가진 플레이어부터 정렬
     private void sortByCrown() {
 
-        // 기본적으로 PlayerNo 기준 정렬하되, 왕관을 가진 플레이어부터 정렬
-        this.playerList = this.playerList.stream().sorted(Comparator.comparingInt(Player::getNo)).collect(Collectors.toList());
-        Queue<Player> playerQueue = new LinkedList<>(this.playerList);
-        while(!playerQueue.peek().isCrown()) {
-            playerQueue.offer(playerQueue.poll());
-        }
-        this.playerList = playerQueue.stream().toList();
+        Queue<Player> playerQueue = new LinkedList<>(this.getPlayerList().stream().sorted(Comparator.comparingInt(Player::getNo)).collect(Collectors.toList()));
+        while(!playerQueue.peek().isCrown()) playerQueue.offer(playerQueue.poll());
+
+        this.setPlayerList(playerQueue.stream().toList());
     }
 
-    public void chooseJob(List<Job> jobList) {
+    public void selectJob(List<Job> jobList) {
 
         List<Job> jobListCopied = new ArrayList<>(jobList);
 
         this.sortByCrown();
         for(Player p : this.playerList) {
-            int jobIndex = (int)(Math.random() * jobListCopied.size());
 
-            Job selected = jobListCopied.get(jobIndex);
+            Job selected = jobListCopied.get(this.getRandomIndex(jobListCopied.size()));
             p.setJob(selected);
             jobListCopied.remove(selected);
 
             log.info(String.format("Player%d가 %s를 선택했습니다", p.getNo(), p.getJob().getName()));
         }
+    }
+
+    public void before(Player player) {
+        player.before();
+        this.moveCrown(player);
+    }
+
+    public void moveCrown(Player player) {
+        if(player.getJob().isKing()) {
+            this.getPlayerList().stream().filter(p_ -> p_.isCrown()).findAny().get().setCrown(false);
+            player.setCrown();
+        }
+    }
+
+    public void getAsset(Player player) {
+
+        if(this.getRandomIndex(2) == 0) {
+            this.getMoneyFromBank(player);
+        }
+        else {
+            this.getBuildingCard(player);
+        }
+    }
+
+    private void getMoneyFromBank(Player player) {
+        player.getMoneyFromBank();
+    }
+
+    private void getBuildingCard(Player player) {
+        Building backCard = player.getBuildingCard(IntStream.range(0,2)
+                .mapToObj(i -> this.getBuildingDeck().poll())
+                .collect(Collectors.toList()));
+        this.getBuildingDeck().offer(backCard);
+    }
+
+    public void build(Player player) {
+        player.build();
+    }
+
+    public boolean after(Player player, boolean isFinalRound) {
+
+        if(!isFinalRound && player.getBuildings().size() == this.finalRoundBuilding) {
+            isFinalRound = true;
+            player.setEndPlayer(true);
+            log.info(String.format("건물을 %s채 지었습니다. 이번 라운드를 마지막으로 게임을 종료합니다.", this.finalRoundBuilding));
+        }
+        player.after();
+
+        return isFinalRound;
     }
 
     public Player getWinner() {
@@ -85,6 +138,14 @@ public class PlayerWrapper {
             // 게임이 종료되면 유령 지구를 원하는 종류의 건물로 간주합니다.
             if(entrySet.size() == 4 && entrySet.stream().anyMatch(e -> e.getKey().equals("S") && e.getValue().size() >= 2 && e.getValue().stream().anyMatch(b -> b.getName().equals("유령 지구")))) {
                 totalScore += 3;
+            }
+        }
+
+        // 의사당
+        if(player.getBuildings().stream().anyMatch(b -> b.getName().equals("비밀 금고"))) {
+            if(entrySet.stream().anyMatch(e -> e.getValue().size() >= 3)) {
+                totalScore += 3;
+                // 게임이 종료되었을 때 자기 도시에 같은 종류의 건물이 최소 3채 건설되어 있다면 추가로 3점을 받습니다.
             }
         }
 
@@ -140,19 +201,15 @@ public class PlayerWrapper {
         }
 
         // 비밀 금고
-        if(player.getBuildings().stream().anyMatch(b -> b.getName().equals("비밀 금고"))) {
+        if(player.getHands().stream().anyMatch(b -> b.getName().equals("비밀 금고"))) {
             totalScore += 3;
             // 비밀 금고는 절대로 도시에 건설할 수 없습니다. 게임이 종료되었을 때, 손에 든 비밀 금고를 공개하고 추가로 3점을 받습니다.
         }
 
-        // 의사당
-        if(player.getBuildings().stream().anyMatch(b -> b.getName().equals("비밀 금고"))) {
-            if(entrySet.stream().anyMatch(e -> e.getValue().size() >= 3)) {
-                totalScore += 3;
-                // 게임이 종료되었을 때 자기 도시에 같은 종류의 건물이 최소 3채 건설되어 있다면 추가로 3점을 받습니다.
-            }
-        }
-
         return totalScore;
+    }
+
+    private int getRandomIndex(int size) {
+        return (int)(Math.random() * size);
     }
 }
