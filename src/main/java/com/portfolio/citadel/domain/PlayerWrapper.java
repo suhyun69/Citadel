@@ -63,15 +63,14 @@ public class PlayerWrapper {
     }
 
     public void before(Player player) {
-        player.before();
-        this.moveCrown(player);
+        log.info(String.format("%s의 차례입니다. Player%d가 행동합니다. (%d/%d/%d)", player.getJob().getName(), player.getNo(), player.getMoney(), player.getHands().size(), player.getBuildings().size()));
+        if(player.getJob().isKing()) this.moveCrown(player);
     }
 
     public void moveCrown(Player player) {
-        if(player.getJob().isKing()) {
-            this.getPlayerList().stream().filter(p_ -> p_.isCrown()).findAny().get().setCrown(false);
-            player.setCrown();
-        }
+        this.getPlayerList().stream().filter(p_ -> p_.isCrown()).findAny().get().setCrown(false);
+        player.setCrown();
+        log.info(String.format("왕관을 가져옵니다."));
     }
 
     public void getAsset(Player player) {
@@ -106,7 +105,7 @@ public class PlayerWrapper {
             player.setEndPlayer(true);
             log.info(String.format("건물을 %s채 지었습니다. 이번 라운드를 마지막으로 게임을 종료합니다.", this.finalRoundBuilding));
         }
-        player.after();
+        log.info(String.format("턴 종료. (%d/%d/%d)", player.getMoney(), player.getHands().size(), player.getBuildings().size()));
 
         return isFinalRound;
     }
