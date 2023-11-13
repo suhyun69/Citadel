@@ -126,36 +126,28 @@ public class PlayerWrapper {
 
         totalScore += player.getBuildings().stream().map(b -> b.getCost()).reduce((b1, b2) -> b1 + b2).orElse(0); // 자신의 도시에 있는 건물 카드들의 건설비용만큼 점수를 받습니다.
 
-        Set<Map.Entry<String, List<Building>>> entrySet = player.getBuildings().stream()
-                .collect(Collectors.groupingBy(b -> b.getType()))
-                .entrySet();
-
-        // 자신의 도시에 건물 카드가 5가지 종류별로 하나씩 건설되었다면 3점을 받습니다.
-        if(entrySet.size() == 5) {
-            totalScore += 3;
-        }
-        else {
-            // 게임이 종료되면 유령 지구를 원하는 종류의 건물로 간주합니다.
-            if(entrySet.size() == 4 && entrySet.stream().anyMatch(e -> e.getKey().equals("S") && e.getValue().size() >= 2 && e.getValue().stream().anyMatch(b -> b.getName().equals("유령 지구")))) {
-                totalScore += 3;
-            }
-        }
-
-        // 의사당
-        if(player.getBuildings().stream().anyMatch(b -> b.getName().equals("비밀 금고"))) {
-            if(entrySet.stream().anyMatch(e -> e.getValue().size() >= 3)) {
-                totalScore += 3;
-                // 게임이 종료되었을 때 자기 도시에 같은 종류의 건물이 최소 3채 건설되어 있다면 추가로 3점을 받습니다.
-            }
-        }
-
         // 가장 먼저 도시를 완성시킨 플레이어는 4점을 받습니다.
         // 도시를 완성시킨 나머지 플레이어는 2점을 받습니다.
-        if(player.getBuildings().size() == 7) {
+        if(player.getBuildings().size() == this.finalRoundBuilding) {
             totalScore += player.isEndPlayer() ? 4 : 2;
         }
 
-        // 특수카드 효과
+        // 유령지구
+        if(player.getBuildings().stream().anyMatch(b -> b.getName().equals("유령지구"))) {
+
+            List<Integer> scoreList = new ArrayList<>();
+            List<Building> buildingCopied = new ArrayList<>(player.getBuildings());
+
+            for(BuildingType type : BuildingType.values()) {
+                buildingCopied.stream().filter(b -> b.getName().equals("유령지구")).findFirst().get().setType(type);
+                scoreList.add(this.getScoreByGhostArea(buildingCopied));
+            }
+
+            totalScore += scoreList.stream().max(Integer::compareTo).orElse(0);
+        }
+        else {
+            totalScore += this.getScoreByGhostArea(player.getBuildings());
+        }
 
         // 동상
         if(player.getBuildings().stream().anyMatch(b -> b.getName().equals("동상"))) {
@@ -172,13 +164,13 @@ public class PlayerWrapper {
 
         // 상아탑
         if(player.getBuildings().stream().anyMatch(b -> b.getName().equals("상아탑"))) {
-            totalScore += (player.getBuildings().stream().filter(b -> b.getType().equals("S")).count() == 1L ? 5: 0);
+            totalScore += (player.getBuildings().stream().filter(b -> b.getType() == BuildingType.Special).count() == 1L ? 5: 0);
             // 게임이 종료되었을 때 자기 도시에 특수 건물이 상아탑뿐이라면 추가로 5점을 받습니다.
         }
 
         // 소원의 우물
         if(player.getBuildings().stream().anyMatch(b -> b.getName().equals("소원의 우물"))) {
-            totalScore += (int)player.getBuildings().stream().filter(b -> b.getType().equals("S")).count();
+            totalScore += (int)player.getBuildings().stream().filter(b -> b.getType() == BuildingType.Special).count();
             // 게임이 종료되면 자기 도시에 건설된 특수 건물 1채당(소원의 우물 포함) 추가로 1점씩을 받습니다.
         }
 
@@ -207,6 +199,30 @@ public class PlayerWrapper {
         }
 
         return totalScore;
+    }
+
+    private int getScoreByGhostArea(List<Building> buildingList) {
+
+        int score = 0;
+
+        Set<Map.Entry<BuildingType, List<Building>>> entrySet = buildingList.stream()
+                .collect(Collectors.groupingBy(Building::getType))
+                .entrySet();
+
+        // 자신의 도시에 건물 카드가 5가지 종류별로 하나씩 건설되었다면 3점을 받습니다.
+        if(entrySet.size() == 5) {
+            score += 3;
+        }
+
+        // 의사당
+        if(buildingList.stream().anyMatch(b -> b.getName().equals("비밀 금고"))) {
+            if(entrySet.stream().anyMatch(e -> e.getValue().size() >= 3)) {
+                score += 3;
+                // 게임이 종료되었을 때 자기 도시에 같은 종류의 건물이 최소 3채 건설되어 있다면 추가로 3점을 받습니다.
+            }
+        }
+
+        return score;
     }
 
     private int getRandomIndex(int size) {
