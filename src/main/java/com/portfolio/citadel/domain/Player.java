@@ -27,6 +27,7 @@ public class Player {
 
     public void setCrown() {
         this.setCrown(true);
+        log.info(String.format("왕관을 가져옵니다."));
     }
 
     // 금화 2개 받기

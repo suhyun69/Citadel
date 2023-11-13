@@ -64,13 +64,14 @@ public class PlayerWrapper {
 
     public void before(Player player) {
         log.info(String.format("%s의 차례입니다. Player%d가 행동합니다. (%d/%d/%d)", player.getJob().getName(), player.getNo(), player.getMoney(), player.getHands().size(), player.getBuildings().size()));
-        if(player.getJob().isKing()) this.moveCrown(player);
+        this.moveCrown(player);
     }
 
     public void moveCrown(Player player) {
-        this.getPlayerList().stream().filter(p_ -> p_.isCrown()).findAny().get().setCrown(false);
-        player.setCrown();
-        log.info(String.format("왕관을 가져옵니다."));
+        if(player.getJob().isKing()) {
+            this.getPlayerList().stream().filter(p_ -> p_.isCrown()).findAny().get().setCrown(false);
+            player.setCrown();
+        }
     }
 
     public void getAsset(Player player) {
