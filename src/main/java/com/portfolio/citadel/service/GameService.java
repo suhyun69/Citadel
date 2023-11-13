@@ -64,12 +64,9 @@ public class GameService {
             log.info(String.format("[Round %d end]", round));
             round++;
 
-            /*
             if(isFinalRound) {
-                Player winner = pw.getWinner();
-                log.info(String.format("Player%d가 총점 %d점으로 승리했습니다", winner.getNo(), winner.getTotalScore()));
+                pw.getWinner();
             }
-            */
         }
     }
 }

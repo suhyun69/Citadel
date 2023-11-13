@@ -111,13 +111,15 @@ public class PlayerWrapper {
         return isFinalRound;
     }
 
-    public Player getWinner() {
+    public void getWinner() {
         this.playerList.stream()
                 .forEach(p -> p.setTotalScore(this.getTotalScore(p)));
 
-        return this.playerList.stream()
+        Player winner = this.playerList.stream()
                 .max(Comparator.comparing(Player::getTotalScore))
                 .get();
+
+        log.info(String.format("Player%d가 총점 %d점으로 승리했습니다", winner.getNo(), winner.getTotalScore()));
     }
 
     private int getTotalScore(Player player) {
@@ -139,7 +141,11 @@ public class PlayerWrapper {
             List<Building> buildingCopied = new ArrayList<>(player.getBuildings());
 
             for(BuildingType type : BuildingType.values()) {
-                buildingCopied.stream().filter(b -> b.getName().equals("유령지구")).findFirst().get().setType(type);
+                buildingCopied.stream()
+                        .filter(b -> b.getName().equals("유령지구"))
+                        .findFirst()
+                        .get()
+                        .setType(type);
                 scoreList.add(this.getScoreByGhostArea(buildingCopied));
             }
 
