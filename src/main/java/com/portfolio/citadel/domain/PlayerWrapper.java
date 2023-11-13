@@ -76,12 +76,18 @@ public class PlayerWrapper {
 
     public void getAsset(Player player) {
 
+        this.getMoneyFromBuilding(player);
+
         if(this.getRandomIndex(2) == 0) {
             this.getMoneyFromBank(player);
         }
         else {
             this.getBuildingCard(player);
         }
+    }
+
+    private void getMoneyFromBuilding(Player player) {
+        player.getMoneyFromBuilding();
     }
 
     private void getMoneyFromBank(Player player) {
